@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AttendX Pro — Attendance & Payroll System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070810;--surface:#0f1020;--surface2:#161728;--surface3:#1e1f35;
+  --border:#252640;--border2:#2e3055;
+  --accent:#5b6af0;--accent2:#e05fff;--accent3:#00e5c0;--accent4:#ffb830;
+  --text:#eeeef5;--muted:#6a6b90;--muted2:#4a4b6a;
+  --success:#22d98a;--warning:#ffb830;--danger:#ff5c7a;--info:#4db8ff;
+  --r:12px;--r2:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--surface)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ── LOGIN ── */
+#loginWrap{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg);overflow:hidden}
+.login-bg{position:absolute;inset:0;pointer-events:none}
+.login-orb{position:absolute;border-radius:50%;filter:blur(80px);animation:orbFloat 12s ease-in-out infinite alternate}
+.login-orb:nth-child(1){width:500px;height:500px;top:-150px;left:-100px;background:radial-gradient(circle,rgba(91,106,240,.25),transparent 70%)}
+.login-orb:nth-child(2){width:400px;height:400px;bottom:-100px;right:-80px;background:radial-gradient(circle,rgba(224,95,255,.2),transparent 70%);animation-delay:-6s}
+.login-orb:nth-child(3){width:300px;height:300px;top:40%;left:60%;background:radial-gradient(circle,rgba(0,229,192,.12),transparent 70%);animation-delay:-3s}
+@keyframes orbFloat{0%{transform:translate(0,0) scale(1)}100%{transform:translate(30px,40px) scale(1.15)}}
+.login-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:50px 50px;opacity:.3}
+.login-card{position:relative;z-index:1;background:rgba(15,16,32,.85);backdrop-filter:blur(20px);border:1px solid var(--border2);border-radius:24px;padding:44px 40px;width:440px;max-width:95vw;box-shadow:0 40px 100px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);animation:cardIn .7s cubic-bezier(.34,1.4,.64,1)}
+@keyframes cardIn{from{opacity:0;transform:translateY(40px) scale(.94)}to{opacity:1;transform:none}}
+.login-brand{text-align:center;margin-bottom:32px}
+.login-brand-logo{display:inline-flex;align-items:center;gap:10px;margin-bottom:10px}
+.brand-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 8px 20px rgba(91,106,240,.4)}
+.login-brand h1{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.login-brand p{font-size:13px;color:var(--muted);font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+.login-head{text-align:center;margin-bottom:28px}
+.login-head h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px}
+.login-head p{font-size:13px;color:var(--muted)}
+.lf-group{margin-bottom:18px}
+.lf-label{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.lf-wrap{position:relative}
+.lf-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;pointer-events:none}
+.lf-input{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:13px 42px;border-radius:10px;font-size:14px;font-family:'Outfit',sans-serif;outline:none;transition:.25s}
+.lf-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(91,106,240,.15)}
+.lf-input::placeholder{color:var(--muted2)}
+.lf-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;transition:.2s}
+.lf-toggle:hover{color:var(--text)}
+.lf-hint{font-size:11px;color:var(--muted2);margin-top:5px;font-family:'JetBrains Mono',monospace}
+.lf-options{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;font-size:12px}
+.lf-remember{display:flex;align-items:center;gap:6px;color:var(--muted);cursor:pointer}
+.lf-remember input{accent-color:var(--accent);width:14px;height:14px}
+.lf-forgot{color:var(--accent);text-decoration:none;font-size:12px}
+.lf-forgot:hover{color:var(--accent2)}
+.lf-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:.3s;position:relative;overflow:hidden;letter-spacing:.3px}
+.lf-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(91,106,240,.4)}
+.lf-btn:active{transform:translateY(0)}
+.lf-spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin-left:8px;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lf-error{background:rgba(255,92,122,.1);border:1px solid rgba(255,92,122,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--danger);margin-bottom:14px;display:none;animation:shake .35s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.particle{position:absolute;width:3px;height:3px;border-radius:50%;animation:particleFloat linear infinite;opacity:0}
+@keyframes particleFloat{0%{transform:translateY(100vh);opacity:.7}100%{transform:translateY(-50px);opacity:0}}
+
+/* ── LAYOUT ── */
+#app{display:none;min-height:100vh}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:248px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto}
+.sb-logo{padding:24px 20px 18px;border-bottom:1px solid var(--border)}
+.sb-brand{display:flex;align-items:center;gap:10px}
+.sb-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.sb-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sb-ver{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:1px}
+.sb-nav{padding:14px 10px;flex:1}
+.sb-section{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted2);letter-spacing:2px;text-transform:uppercase;padding:10px 10px 5px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r2);cursor:pointer;transition:.2s;color:var(--muted);font-size:13.5px;font-weight:500;margin-bottom:1px;border:1px solid transparent;position:relative}
+.sb-item:hover{color:var(--text);background:var(--surface2)}
+.sb-item.active{color:var(--accent);background:rgba(91,106,240,.1);border-color:rgba(91,106,240,.2)}
+.sb-item svg{width:15px;height:15px;flex-shrink:0}
+.sb-badge{margin-left:auto;background:var(--danger);color:#fff;font-size:9px;font-family:'JetBrains Mono',monospace;padding:2px 6px;border-radius:20px;line-height:1.4}
+.sb-user{padding:14px;border-top:1px solid var(--border)}
+.sb-user-inner{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#fff;flex-shrink:0}
+.sb-uname{font-size:13px;font-weight:600;line-height:1.3}
+.sb-urole{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+
+/* ── MAIN ── */
+.main{margin-left:248px;flex:1;display:flex;flex-direction:column}
+.topbar{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(7,8,16,.85);backdrop-filter:blur(10px);position:sticky;top:0;z-index:50}
+.tb-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);background:var(--surface2);padding:6px 12px;border-radius:6px;border:1px solid var(--border)}
+.btn{padding:8px 16px;border-radius:var(--r2);border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:600;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#4a59df;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--accent)}
+.btn-success{background:rgba(34,217,138,.12);color:var(--success);border:1px solid rgba(34,217,138,.25)}
+.btn-danger{background:rgba(255,92,122,.12);color:var(--danger);border:1px solid rgba(255,92,122,.25)}
+.btn-warning{background:rgba(255,184,48,.12);color:var(--warning);border:1px solid rgba(255,184,48,.25)}
+.btn-info{background:rgba(77,184,255,.12);color:var(--info);border:1px solid rgba(77,184,255,.25)}
+.btn-logout{background:rgba(255,92,122,.1);color:var(--danger);border:1px solid rgba(255,92,122,.2);font-size:12px}
+.btn-logout:hover{background:rgba(255,92,122,.2)}
+.content{padding:24px 28px;flex:1}
+
+/* ── PAGES ── */
+.page{display:none;animation:pgIn .3s ease}
+.page.active{display:block}
+@keyframes pgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── STAT CARDS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;position:relative;overflow:hidden;transition:.25s;cursor:default}
+.stat-card::after{content:'';position:absolute;top:-20px;right:-20px;width:90px;height:90px;border-radius:50%;filter:blur(35px);opacity:.4}
+.stat-card.c1::after{background:var(--accent)}.stat-card.c2::after{background:var(--success)}
+.stat-card.c3::after{background:var(--accent2)}.stat-card.c4::after{background:var(--warning)}
+.stat-card.c5::after{background:var(--info)}.stat-card.c6::after{background:var(--accent3)}
+.stat-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.sc-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.sc-val{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;line-height:1;margin-bottom:6px}
+.sc-sub{font-size:11px;color:var(--muted)}
+.sc-sub .up{color:var(--success)}.sc-sub .dn{color:var(--danger)}
+.sc-icon{position:absolute;top:18px;right:18px;font-size:22px;opacity:.25}
+.sc-spark{position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 var(--r) var(--r)}
+
+/* ── CLOCK SECTION ── */
+.clock-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:22px;position:relative;overflow:hidden}
+.card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.clock-time{font-family:'JetBrains Mono',monospace;font-size:46px;font-weight:400;letter-spacing:-2px;background:linear-gradient(135deg,var(--text),var(--muted));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.clock-date{font-size:12px;color:var(--muted);margin:4px 0 20px;font-family:'JetBrains Mono',monospace}
+.clock-btns{display:flex;gap:8px;flex-wrap:wrap}
+.clock-status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:12px}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--muted2)}
+.sdot.in{background:var(--success);box-shadow:0 0 8px var(--success);animation:pulse 2s infinite}
+.sdot.brk{background:var(--warning);box-shadow:0 0 8px var(--warning);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.log-list{max-height:200px;overflow-y:auto}
+.log-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(37,38,64,.6);font-size:12px}
+.log-row:last-child{border:none}
+.log-badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace}
+.lb-in{background:rgba(34,217,138,.12);color:var(--success)}
+.lb-out{background:rgba(255,92,122,.12);color:var(--danger)}
+.lb-brk{background:rgba(255,184,48,.12);color:var(--warning)}
+.lb-res{background:rgba(77,184,255,.12);color:var(--info)}
+.log-time{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:11px}
+
+/* ── WEEK STRIP ── */
+.week-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:22px}
+.wday{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 10px;text-align:center;transition:.2s}
+.wday.today{border-color:var(--accent);background:rgba(91,106,240,.08)}
+.wday-name{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.wday-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin:4px 0}
+.wday-hrs{font-size:10px;color:var(--muted)}
+.wday-bar{height:3px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden}
+.wday-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent3))}
+
+/* ── CHARTS ── */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px}
+.chart-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:22px}
+/* SVG line chart */
+.linechart-wrap{position:relative;height:140px}
+.linechart-wrap svg{width:100%;height:100%}
+.lc-point{cursor:pointer;transition:.2s}
+.lc-point:hover{r:6}
+/* Bar chart */
+.bar-chart-wrap{display:flex;align-items:flex-end;gap:5px;height:130px;padding-top:10px}
+.bc-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bc-bar{width:100%;border-radius:5px 5px 0 0;transition:.6s ease;position:relative;min-height:4px;cursor:pointer}
+.bc-bar::after{content:attr(data-v);position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted);font-family:'JetBrains Mono',monospace;opacity:0;transition:.2s;white-space:nowrap}
+.bc-bar:hover::after{opacity:1}
+.bc-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-align:center}
+/* Donut */
+.donut-wrap{display:flex;align-items:center;gap:18px}
+.donut-legend{flex:1}
+.dl-item{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:8px}
+.dl-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.dl-val{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)}
+/* Progress bar */
+.prog-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(37,38,64,.5)}
+.prog-row:last-child{border:none}
+.prog-name{font-size:12.5px;font-weight:500;min-width:90px}
+.prog-bar-outer{flex:1;height:6px;background:var(--border);border-radius:6px;overflow:hidden}
+.prog-bar-inner{height:100%;border-radius:6px;transition:.6s ease}
+.prog-pct{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);min-width:38px;text-align:right}
+/* Trend line mini */
+.trend-mini{display:flex;align-items:flex-end;gap:3px;height:50px;margin-top:8px}
+.tm-bar{flex:1;border-radius:2px 2px 0 0;min-height:3px;transition:.5s}
+
+/* ── SECTION HEADER ── */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.sec-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── TABLE ── */
+.tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead{background:var(--surface2)}
+th{padding:11px 14px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid rgba(37,38,64,.4);vertical-align:middle}
+tr:last-child td{border:none}
+tr:hover td{background:rgba(91,106,240,.04)}
+.badge{padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600;font-family:'JetBrains Mono',monospace;display:inline-block;white-space:nowrap}
+.b-present{background:rgba(34,217,138,.12);color:var(--success)}
+.b-absent{background:rgba(255,92,122,.12);color:var(--danger)}
+.b-late{background:rgba(255,184,48,.12);color:var(--warning)}
+.b-leave{background:rgba(91,106,240,.15);color:var(--accent)}
+.b-approved{background:rgba(34,217,138,.1);color:var(--success)}
+.b-rejected{background:rgba(255,92,122,.1);color:var(--danger)}
+.b-pending{background:rgba(255,184,48,.1);color:var(--warning)}
+.b-active{background:rgba(34,217,138,.1);color:var(--success)}
+.b-inactive{background:rgba(255,92,122,.1);color:var(--danger)}
+.emp-chip{display:flex;align-items:center;gap:9px}
+.ec-av{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+
+/* ── FILTERS ── */
+.filters{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.fi{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 13px;border-radius:var(--r2);font-size:12.5px;font-family:'Outfit',sans-serif;outline:none;transition:.2s}
+.fi:focus{border-color:var(--accent)}
+.fi::placeholder{color:var(--muted2)}
+select.fi option{background:var(--surface2)}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:400;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:.25s}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:18px;padding:28px;width:520px;max-width:95vw;transform:scale(.95);transition:.25s;max-height:90vh;overflow-y:auto}
+.modal-bg.open .modal{transform:scale(1)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700}
+.modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:22px;line-height:1;transition:.2s}
+.modal-close:hover{color:var(--text)}
+.modal-ft{display:flex;gap:10px;justify-content:flex-end;margin-top:22px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg{display:flex;flex-direction:column;gap:6px}
+.fg.full{grid-column:1/-1}
+.fg label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px}
+.fc{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 13px;border-radius:var(--r2);font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:.2s;width:100%}
+.fc:focus{border-color:var(--accent)}
+textarea.fc{resize:vertical;min-height:72px}
+
+/* ── LEAVE BALANCE ── */
+.lb-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.lb-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center}
+.lb-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--accent)}
+.lb-lbl{font-size:10px;color:var(--muted);margin-top:2px}
+.lb-used{font-size:10px;color:var(--muted2);margin-top:3px;font-family:'JetBrains Mono',monospace}
+
+/* ── SALARY MODULE ── */
+.salary-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.salary-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.skpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;position:relative;overflow:hidden}
+.skpi::after{content:'';position:absolute;top:-15px;right:-15px;width:60px;height:60px;border-radius:50%;filter:blur(25px);opacity:.4}
+.skpi.s1::after{background:var(--success)}.skpi.s2::after{background:var(--accent)}.skpi.s3::after{background:var(--danger)}.skpi.s4::after{background:var(--warning)}
+.skpi-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
+.skpi-lbl{font-size:10px;color:var(--muted);margin-top:3px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:1px}
+.salary-formula{background:linear-gradient(135deg,rgba(91,106,240,.08),rgba(224,95,255,.05));border:1px solid rgba(91,106,240,.2);border-radius:var(--r);padding:18px;margin-bottom:20px}
+.sf-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;color:var(--accent)}
+.sf-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(37,38,64,.5);font-size:12.5px}
+.sf-row:last-child{border:none;font-weight:700;font-size:13px;color:var(--success)}
+.sf-lbl{color:var(--muted)}
+.sf-val{font-family:'JetBrains Mono',monospace;color:var(--text)}
+
+/* ── PROFILE ── */
+.profile-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:28px;margin-bottom:16px;display:flex;align-items:center;gap:22px;position:relative;overflow:hidden}
+.profile-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;opacity:.06;filter:blur(30px)}
+.ph-av{width:68px;height:68px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:26px;color:#fff;flex-shrink:0}
+.ph-name{font-family:'Syne',sans-serif;font-size:21px;font-weight:800}
+.ph-role{color:var(--accent);font-size:12px;margin-top:2px;font-family:'JetBrains Mono',monospace}
+.ph-meta{display:flex;gap:18px;margin-top:10px;flex-wrap:wrap}
+.ph-meta span{font-size:11.5px;color:var(--muted)}
+.pstats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.pstat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center}
+.pstat-v{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
+.pstat-l{font-size:10px;color:var(--muted);margin-top:3px}
+
+/* ── ADMIN ── */
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ── NOTIFICATION ── */
+.notif{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:13px 17px;font-size:13px;display:flex;align-items:center;gap:10px;z-index:600;transform:translateX(130%);transition:.4s cubic-bezier(.34,1.5,.64,1);box-shadow:0 10px 40px rgba(0,0,0,.5);max-width:320px}
+.notif.show{transform:translateX(0)}
+.nd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* ── REPORT PAGE ── */
+.rep-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.rkpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;display:flex;align-items:center;gap:14px}
+.rkpi-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.rkpi-v{font-family:'Syne',sans-serif;font-size:24px;font-weight:800}
+.rkpi-l{font-size:10px;color:var(--muted);margin-top:2px}
+
+@media(max-width:1200px){.stats-row{grid-template-columns:repeat(2,1fr)}.chart-row{grid-template-columns:1fr}.salary-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.sidebar{width:56px}.sidebar .sb-name,.sidebar .sb-ver,.sidebar .sb-section,.sidebar .sb-item span,.sidebar .sb-user-inner>div,.sb-badge{display:none}.main{margin-left:56px}.content{padding:14px}.stats-row{grid-template-columns:repeat(2,1fr)}.chart-row3{grid-template-columns:1fr 1fr}}
+
+/* ── AUTH TABS ── */
+.auth-tabs{display:flex;gap:0;margin-bottom:26px;background:var(--surface2);border-radius:10px;padding:4px;border:1px solid var(--border)}
+.auth-tab{flex:1;padding:9px;text-align:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;border-radius:7px;cursor:pointer;transition:.2s;color:var(--muted)}
+.auth-tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 14px rgba(91,106,240,.35)}
+.auth-panel{display:none}.auth-panel.active{display:block}
+/* ── ACCOUNT SETTINGS MODAL ── */
+.accs-tabs{display:flex;gap:8px;margin-bottom:20px}
+.accs-tab{padding:8px 16px;border-radius:var(--r2);border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:600;transition:.2s}
+.accs-tab.active{background:rgba(91,106,240,.15);color:var(--accent);border-color:rgba(91,106,240,.4)}
+.accs-panel{display:none}.accs-panel.active{display:block}
+.accs-success{background:rgba(34,217,138,.1);border:1px solid rgba(34,217,138,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--success);margin-bottom:12px;display:none}
+.accs-error{background:rgba(255,92,122,.1);border:1px solid rgba(255,92,122,.3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--danger);margin-bottom:12px;display:none}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<div id="loginWrap">
+  <div class="login-bg">
+    <div class="login-grid"></div>
+    <div class="login-orb"></div><div class="login-orb"></div><div class="login-orb"></div>
+  </div>
+  <div id="loginParticles" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div>
+  <div class="login-card" style="width:480px">
+    <div class="login-brand">
+      <div class="login-brand-logo">
+        <div class="brand-icon">🏢</div>
+        <div class="sb-name" style="font-size:26px">AttendX</div>
+      </div>
+      <p>EMPLOYEE ATTENDANCE & PAYROLL</p>
+    </div>
+
+    <!-- Auth Tabs -->
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">🔑 Sign In</div>
+      <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">📝 Register</div>
+    </div>
+
+    <!-- LOGIN PANEL -->
+    <div class="auth-panel active" id="panelLogin">
+      <div class="lf-error" id="loginErr">Invalid Employee ID or Password. Please try again.</div>
+      <div class="lf-group">
+        <label class="lf-label">Employee ID</label>
+        <div class="lf-wrap">
+          <span class="lf-icon">🪪</span>
+          <input type="text" class="lf-input" id="empIdInput" placeholder="e.g. EMP001" maxlength="10" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <div class="lf-hint">Enter your Employee ID (e.g. EMP001 – EMP007)</div>
+      </div>
+      <div class="lf-group">
+        <label class="lf-label">Password</label>
+        <div class="lf-wrap">
+          <span class="lf-icon">🔐</span>
+          <input type="password" class="lf-input" id="passInput" placeholder="Password" maxlength="20" onkeydown="if(event.key==='Enter')doLogin()">
+          <button class="lf-toggle" id="passToggle" onclick="togglePwd()">👁</button>
+        </div>
+        <div class="lf-hint">Any password with minimum 6 characters</div>
+      </div>
+      <div class="lf-options">
+        <label class="lf-remember"><input type="checkbox"> Remember me</label>
+        <a href="#" class="lf-forgot" onclick="switchAuthTab('register');return false">New here? Register</a>
+      </div>
+      <button class="lf-btn" onclick="doLogin()" id="loginBtn">
+        Sign In <span class="lf-spinner" id="loginSpin"></span>
+      </button>
+    </div>
+
+    <!-- REGISTER PANEL -->
+    <div class="auth-panel" id="panelRegister">
+      <div class="lf-error" id="regErr"></div>
+      <div class="lf-error" id="regSuccess" style="background:rgba(34,217,138,.1);border-color:rgba(34,217,138,.3);color:var(--success)"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="lf-group" style="margin-bottom:12px">
+          <label class="lf-label">Full Name</label>
+          <div class="lf-wrap">
+            <span class="lf-icon">👤</span>
+            <input type="text" class="lf-input" id="regName" placeholder="e.g. Satya Reddy">
+          </div>
+        </div>
+        <div class="lf-group" style="margin-bottom:12px">
+          <label class="lf-label">Employee ID</label>
+          <div class="lf-wrap">
+            <span class="lf-icon">🪪</span>
+            <input type="text" class="lf-input" id="regId" placeholder="e.g. EMP008" maxlength="10">
+          </div>
+        </div>
+        <div class="lf-group" style="margin-bottom:12px">
+          <label class="lf-label">Department</label>
+          <div class="lf-wrap">
+            <span class="lf-icon">🏢</span>
+            <select class="lf-input" id="regDept">
+              <option value="">Select Department</option>
+              <option>Engineering</option><option>Design</option><option>Marketing</option>
+              <option>HR</option><option>Finance</option><option>Operations</option>
+            </select>
+          </div>
+        </div>
+        <div class="lf-group" style="margin-bottom:12px">
+          <label class="lf-label">Role</label>
+          <div class="lf-wrap">
+            <span class="lf-icon">💼</span>
+            <input type="text" class="lf-input" id="regRole" placeholder="e.g. Software Engineer">
+          </div>
+        </div>
+        <div class="lf-group" style="margin-bottom:12px">
+          <label class="lf-label">Phone</label>
+          <div class="lf-wrap">
+            <span class="lf-icon">📱</span>
+            <input type="tel" class="lf-input" id="regPhone" placeholder="+91 98765 43210">
+          </div>
+        </div>
+        <div class="lf-group" style="margin-bottom:12px">
+          <label class="lf-label">Email</label>
+          <div class="lf-wrap">
+            <span class="lf-icon">📧</span>
+            <input type="email" class="lf-input" id="regEmail" placeholder="you@company.com">
+          </div>
+        </div>
+      </div>
+      <div class="lf-group" style="margin-bottom:12px">
+        <label class="lf-label">Password</label>
+        <div class="lf-wrap">
+          <span class="lf-icon">🔐</span>
+          <input type="password" class="lf-input" id="regPass" placeholder="Min 6 chars + 1 special (#@!$%&*)" maxlength="20">
+          <button class="lf-toggle" onclick="toggleRegPwd()">👁</button>
+        </div>
+        <div class="lf-hint">Min 6 characters with at least one special character</div>
+      </div>
+      <div class="lf-group">
+        <label class="lf-label">Confirm Password</label>
+        <div class="lf-wrap">
+          <span class="lf-icon">🔒</span>
+          <input type="password" class="lf-input" id="regPassConfirm" placeholder="Re-enter password" maxlength="20" onkeydown="if(event.key==='Enter')doRegister()">
+        </div>
+      </div>
+      <button class="lf-btn" onclick="doRegister()" style="margin-top:4px">
+        Create Account <span class="lf-spinner" id="regSpin"></span>
+      </button>
+      <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted)">Already have an account? <a href="#" class="lf-forgot" onclick="switchAuthTab('login');return false">Sign In</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="app">
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-brand">
+      <div class="sb-icon">🏢</div>
+      <div><div class="sb-name">AttendX</div><div class="sb-ver">PRO v3.0</div></div>
+    </div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">Main</div>
+    <div class="sb-item active" onclick="nav('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="sb-item" onclick="nav('attendance',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>Attendance</span>
+    </div>
+    <div class="sb-item" onclick="nav('leave',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Leave Requests</span>
+      <span class="sb-badge" id="leaveBadge">3</span>
+    </div>
+    <div class="sb-item" onclick="nav('salary',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span>Salary</span>
+    </div>
+    <div class="sb-item" onclick="nav('reports',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span>Reports</span>
+    </div>
+    <div class="sb-section">Admin</div>
+    <div class="sb-item" onclick="nav('employees',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Employees</span>
+    </div>
+    <div class="sb-item" onclick="nav('profile',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>My Profile</span>
+    </div>
+  </div>
+  <div class="sb-user">
+    <div class="sb-user-inner">
+      <div class="sb-avatar" id="sbAvatar">JD</div>
+      <div><div class="sb-uname" id="sbName">John Doe</div><div class="sb-urole" id="sbRole">Admin · EMP001</div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="tb-title" id="tbTitle">Dashboard</div>
+    <div class="tb-right">
+      <div class="tb-date" id="tbDate"></div>
+      <button class="btn btn-ghost" onclick="exportCSV()">⬇ Export</button>
+      <button class="btn btn-primary" onclick="openModal('leaveModal')">+ Leave</button>
+      <button class="btn btn-logout" onclick="doLogout()">⏻ Logout</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="page active" id="pg-dashboard">
+      <div class="stats-row">
+        <div class="stat-card c1"><div class="sc-icon">👥</div><div class="sc-label">Total Employees</div><div class="sc-val">7</div><div class="sc-sub"><span class="up">Active team</span></div><div class="sc-spark" style="background:linear-gradient(90deg,var(--accent),var(--accent2))"></div></div>
+        <div class="stat-card c2"><div class="sc-icon">✅</div><div class="sc-label">Present Today</div><div class="sc-val" id="statPresent" style="color:var(--success)">6</div><div class="sc-sub"><span class="up">85.7%</span> rate</div><div class="sc-spark" style="background:var(--success)"></div></div>
+        <div class="stat-card c3"><div class="sc-icon">🏖️</div><div class="sc-label">On Leave</div><div class="sc-val" id="statLeave" style="color:var(--accent2)">1</div><div class="sc-sub">Approved</div><div class="sc-spark" style="background:var(--accent2)"></div></div>
+        <div class="stat-card c4"><div class="sc-icon">⏰</div><div class="sc-label">Late Today</div><div class="sc-val" id="statLate" style="color:var(--warning)">2</div><div class="sc-sub">Avg <span class="dn">+18 min</span></div><div class="sc-spark" style="background:var(--warning)"></div></div>
+      </div>
+
+      <!-- CLOCK + LOG -->
+      <div class="clock-grid">
+        <div class="card">
+          <div class="clock-time" id="liveClock">00:00:00</div>
+          <div class="clock-date" id="liveDate"></div>
+          <div class="clock-btns">
+            <button class="btn btn-success" id="btnIn" onclick="clockAction('in')">✓ Clock In</button>
+            <button class="btn btn-danger" id="btnOut" onclick="clockAction('out')" disabled>✗ Clock Out</button>
+            <button class="btn btn-warning" id="btnBrk" onclick="clockAction('brk')">☕ Break</button>
+          </div>
+          <div class="clock-status">
+            <div class="sdot" id="sdot"></div>
+            <span id="stext">Not clocked in</span>
+            <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px" id="wdur"></span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 Today's Log</div>
+          <div class="log-list" id="todayLog"><div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">No records yet</div></div>
+        </div>
+      </div>
+
+      <!-- WEEK -->
+      <div class="sec-hd"><div><div class="sec-title">This Week</div><div class="sec-sub">Feb 24 – Mar 2, 2026</div></div></div>
+      <div class="week-strip" id="weekStrip"></div>
+
+      <!-- CHARTS ROW -->
+      <div class="chart-row">
+        <div class="card">
+          <div class="card-title">📈 Monthly Attendance Trend</div>
+          <div class="linechart-wrap" id="trendChart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🍩 Today's Breakdown</div>
+          <div class="donut-wrap" id="donutWrap"></div>
+        </div>
+      </div>
+
+      <!-- TODAY TABLE -->
+      <div class="sec-hd"><div class="sec-title">Today's Attendance</div><button class="btn btn-ghost" onclick="nav('attendance',document.querySelector('.sb-item:nth-child(2)'))">View All →</button></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Employee</th><th>Dept</th><th>In</th><th>Out</th><th>Hours</th><th>Status</th></tr></thead>
+        <tbody id="dashTbl"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ═══ ATTENDANCE ═══ -->
+    <div class="page" id="pg-attendance">
+      <div class="filters">
+        <input type="date" class="fi" id="attDateF" onchange="renderAtt()">
+        <select class="fi" id="attDeptF" onchange="renderAtt()"><option value="">All Departments</option><option>Engineering</option><option>Design</option><option>Marketing</option><option>HR</option><option>Finance</option><option>Operations</option></select>
+        <select class="fi" id="attStatF" onchange="renderAtt()"><option value="">All Status</option><option>Present</option><option>Late</option><option>On Leave</option><option>Absent</option></select>
+        <input type="text" class="fi" placeholder="Search…" id="attSearchF" oninput="renderAtt()" style="flex:1;min-width:140px">
+        <button class="btn btn-primary" onclick="markAllPresent()">✓ Mark All Present</button>
+      </div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th><input type="checkbox" onchange="toggleAllCB(this)"></th><th>Employee</th><th>EmpID</th><th>Dept</th><th>In</th><th>Out</th><th>Break</th><th>Net Hrs</th><th>OT</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="attTbl"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ═══ LEAVE ═══ -->
+    <div class="page" id="pg-leave">
+      <div class="lb-row">
+        <div class="lb-card"><div class="lb-val">12</div><div class="lb-lbl">Annual Leave</div><div class="lb-used">5 used</div></div>
+        <div class="lb-card"><div class="lb-val" style="color:var(--accent2)">6</div><div class="lb-lbl">Sick Leave</div><div class="lb-used">2 used</div></div>
+        <div class="lb-card"><div class="lb-val" style="color:var(--accent3)">3</div><div class="lb-lbl">Casual Leave</div><div class="lb-used">0 used</div></div>
+        <div class="lb-card"><div class="lb-val" style="color:var(--warning)">2</div><div class="lb-lbl">Comp Off</div><div class="lb-used">0 used</div></div>
+      </div>
+      <div class="sec-hd"><div><div class="sec-title">Leave Requests</div><div class="sec-sub" id="pendSub">3 pending</div></div><button class="btn btn-primary" onclick="openModal('leaveModal')">+ Apply Leave</button></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Employee</th><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Applied</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="leaveTbl"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ═══ SALARY ═══ -->
+    <div class="page" id="pg-salary">
+      <div class="salary-formula">
+        <div class="sf-title">💡 Salary Calculation Formula</div>
+        <div class="sf-row"><span class="sf-lbl">Per Day Salary</span><span class="sf-val">₹1,000 / day</span></div>
+        <div class="sf-row"><span class="sf-lbl">Late Arrival Penalty</span><span class="sf-val">₹200 per late day</span></div>
+        <div class="sf-row"><span class="sf-lbl">Absent Deduction</span><span class="sf-val">₹1,000 per absent day (full day deducted)</span></div>
+        <div class="sf-row"><span class="sf-lbl">Leave Days</span><span class="sf-val">No deduction (approved leave paid)</span></div>
+        <div class="sf-row"><span class="sf-lbl">Working Days (Feb 2026)</span><span class="sf-val">20 days</span></div>
+        <div class="sf-row"><span class="sf-lbl">Formula</span><span class="sf-val">(Present Days × ₹1,000) − (Late Days × ₹200)</span></div>
+      </div>
+      <!-- Interactive Salary Calculator -->
+      <div style="background:linear-gradient(135deg,rgba(0,229,192,.07),rgba(91,106,240,.07));border:1px solid rgba(0,229,192,.25);border-radius:var(--r);padding:20px;margin-bottom:20px">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;margin-bottom:16px;color:var(--accent3)">🧮 Quick Salary Calculator</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px">
+          <div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Present Days</div><input type="number" class="fi" id="qsc_present" value="18" min="0" max="20" oninput="quickCalc()" style="width:100%"></div>
+          <div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Late Days</div><input type="number" class="fi" id="qsc_late" value="2" min="0" max="20" oninput="quickCalc()" style="width:100%"></div>
+          <div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Per Day Salary (₹)</div><input type="number" class="fi" id="qsc_perday" value="1000" min="0" oninput="quickCalc()" style="width:100%"></div>
+          <div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">Late Penalty (₹)</div><input type="number" class="fi" id="qsc_penalty" value="200" min="0" oninput="quickCalc()" style="width:100%"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Gross Pay</div><div id="qsc_gross" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800">₹18,000</div></div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Late Penalty</div><div id="qsc_lateded" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--danger)">−₹400</div></div>
+          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Absent Deduct</div><div id="qsc_absded" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--warning)">−₹0</div></div>
+          <div style="background:linear-gradient(135deg,rgba(34,217,138,.15),rgba(91,106,240,.1));border:1px solid rgba(34,217,138,.3);border-radius:8px;padding:12px;text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Net Salary</div><div id="qsc_net" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--success)">₹17,600</div></div>
+        </div>
+      </div>
+      <div class="salary-kpi">
+        <div class="skpi s1"><div class="skpi-val" id="skTotalPay" style="color:var(--success)">₹1,18,000</div><div class="skpi-lbl">Total Payroll (Feb)</div></div>
+        <div class="skpi s2"><div class="skpi-val" id="skAvgSal" style="color:var(--accent)">₹16,857</div><div class="skpi-lbl">Avg Salary / Employee</div></div>
+        <div class="skpi s3"><div class="skpi-val" id="skPenalty" style="color:var(--danger)">₹2,600</div><div class="skpi-lbl">Total Late Penalties</div></div>
+        <div class="skpi s4"><div class="skpi-val" id="skDeduct" style="color:var(--warning)">₹5,000</div><div class="skpi-lbl">Absent Deductions</div></div>
+      </div>
+      <div class="sec-hd"><div class="sec-title">Employee Salary Slip — Feb 2026</div>
+        <select class="fi" id="salMonthF" onchange="renderSalary()"><option value="2">February 2026</option><option value="1">January 2026</option></select>
+      </div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Employee</th><th>EmpID</th><th>Dept</th><th>Working Days</th><th>Present</th><th>Late</th><th>Absent</th><th>Gross Pay</th><th>Late Penalty</th><th>Absent Deduct</th><th>Net Salary</th><th>Status</th><th>Calc</th></tr></thead>
+        <tbody id="salaryTbl"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ═══ REPORTS ═══ -->
+    <div class="page" id="pg-reports">
+      <div class="filters" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:18px">
+        <div class="fg"><label>From</label><input type="date" class="fi" value="2026-02-01"></div>
+        <div class="fg"><label>To</label><input type="date" class="fi" value="2026-02-27"></div>
+        <div class="fg"><label>Dept</label><select class="fi"><option>All Departments</option><option>Engineering</option><option>Design</option><option>Marketing</option><option>HR</option></select></div>
+        <div class="fg"><label>Type</label><select class="fi"><option>Monthly Summary</option><option>Daily Report</option><option>OT Report</option></select></div>
+        <button class="btn btn-primary" style="align-self:flex-end" onclick="notify('Report generated!','var(--success)')">Generate</button>
+        <button class="btn btn-ghost" style="align-self:flex-end" onclick="exportCSV()">⬇ CSV</button>
+      </div>
+      <div class="rep-kpi">
+        <div class="rkpi"><div class="rkpi-icon" style="background:rgba(91,106,240,.12)">📊</div><div><div class="rkpi-v" style="color:var(--accent)">88.6%</div><div class="rkpi-l">Avg Attendance Rate</div></div></div>
+        <div class="rkpi"><div class="rkpi-icon" style="background:rgba(34,217,138,.12)">⏱️</div><div><div class="rkpi-v" style="color:var(--success)">7.9h</div><div class="rkpi-l">Avg Daily Hours</div></div></div>
+        <div class="rkpi"><div class="rkpi-icon" style="background:rgba(255,184,48,.12)">🔥</div><div><div class="rkpi-v" style="color:var(--warning)">38h</div><div class="rkpi-l">Total Overtime</div></div></div>
+      </div>
+
+      <!-- DEPT ATTENDANCE RATE + DAILY TREND -->
+      <div class="chart-row">
+        <div class="card">
+          <div class="card-title">🏢 Department Attendance Rate</div>
+          <div id="deptRateChart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📅 Daily Attendance Trend (Feb 2026)</div>
+          <div class="linechart-wrap" id="dailyTrendChart"></div>
+          <div style="display:flex;gap:14px;margin-top:8px;font-size:11px;flex-wrap:wrap">
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:3px;background:var(--success);display:inline-block;border-radius:2px"></span>Present</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:3px;background:var(--warning);display:inline-block;border-radius:2px"></span>Late</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:3px;background:var(--danger);display:inline-block;border-radius:2px"></span>Absent</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-row">
+        <div class="card">
+          <div class="card-title">📊 Monthly Attendance by Department <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);font-weight:400">(Present · Late · Absent — Feb 2026)</span></div>
+          <div id="deptBarChart" style="height:180px;position:relative"></div>
+          <div style="display:flex;gap:16px;margin-top:10px;font-size:11px;flex-wrap:wrap">
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--success);display:inline-block"></span>Present</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--warning);display:inline-block"></span>Late</span>
+            <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--danger);display:inline-block"></span>Absent</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">💰 Salary Distribution</div>
+          <div class="donut-wrap" id="salaryDonut"></div>
+        </div>
+      </div>
+
+      <div class="sec-hd"><div class="sec-title">Employee Monthly Report</div></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Employee</th><th>Dept</th><th>Present</th><th>Absent</th><th>Late</th><th>Leave</th><th>Total Hrs</th><th>OT Hrs</th><th>Net Salary</th><th>Att%</th></tr></thead>
+        <tbody id="reportTbl"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ═══ EMPLOYEES ═══ -->
+    <div class="page" id="pg-employees">
+      <div class="sec-hd"><div><div class="sec-title">Employee Management</div><div class="sec-sub">7 active employees</div></div><button class="btn btn-primary" onclick="openModal('empModal')">+ Add Employee</button></div>
+      <div class="filters">
+        <input type="text" class="fi" placeholder="Search name…" oninput="filterEmps(this.value)" style="flex:1">
+        <select class="fi" onchange="filterEmpsDept(this.value)"><option value="">All Departments</option><option>Engineering</option><option>Design</option><option>Marketing</option><option>HR</option><option>Finance</option><option>Operations</option></select>
+      </div>
+      <div class="tbl-wrap" style="margin-bottom:20px">
+        <table><thead><tr><th>Employee</th><th>EmpID</th><th>Dept</th><th>Role</th><th>Join Date</th><th>Phone</th><th>Password</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="empTbl"></tbody></table>
+      </div>
+      <div class="admin-grid">
+        <div class="card">
+          <div class="card-title">📊 Dept Attendance Rate</div>
+          <div id="adminDeptRates"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚙️ System Settings</div>
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px"><div><div style="font-weight:500">Work Hours/Day</div><div style="font-size:11px;color:var(--muted)">Required daily hours</div></div><input type="number" class="fi" value="8" style="width:65px;text-align:center"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px"><div><div style="font-weight:500">Late Threshold</div><div style="font-size:11px;color:var(--muted)">Minutes after shift start</div></div><input type="number" class="fi" value="15" style="width:65px;text-align:center"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px"><div><div style="font-weight:500">Shift Start</div><div style="font-size:11px;color:var(--muted)">Default office hours</div></div><input type="time" class="fi" value="09:00" style="width:100px"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);font-size:13px"><div><div style="font-weight:500">Per Day Salary</div><div style="font-size:11px;color:var(--muted)">Base salary per working day</div></div><input type="number" class="fi" value="1000" style="width:80px;text-align:center" id="perDaySal"></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;font-size:13px"><div><div style="font-weight:500">Late Penalty</div><div style="font-size:11px;color:var(--muted)">Deduction per late day</div></div><input type="number" class="fi" value="200" style="width:80px;text-align:center" id="latePenalty"></div>
+          </div>
+          <button class="btn btn-primary" style="margin-top:16px" onclick="notify('Settings saved!','var(--success)')">Save Settings</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PROFILE ═══ -->
+    <div class="page" id="pg-profile">
+      <div class="profile-hero">
+        <div class="ph-av" id="profileAv">JD</div>
+        <div>
+          <div class="ph-name" id="profileName">John Doe</div>
+          <div class="ph-role" id="profileRole">Senior Software Engineer · EMP001</div>
+          <div class="ph-meta">
+            <span>📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f19b9e999fdf959e94b1929e9c81909f88df929e9c">[email&#160;protected]</a></span>
+            <span>📱 +91 98765 43210</span>
+            <span>🗓️ Joined Jan 15, 2022</span>
+            <span>🏢 Engineering</span>
+          </div>
+        </div>
+        <button class="btn btn-ghost" style="margin-left:auto" onclick="openModal('accSettingsModal')">✏️ Edit Account</button>
+      </div>
+      <div class="pstats">
+        <div class="pstat"><div class="pstat-v" style="color:var(--success)">92%</div><div class="pstat-l">Attendance Rate</div></div>
+        <div class="pstat"><div class="pstat-v" style="color:var(--accent)">164h</div><div class="pstat-l">Hours This Month</div></div>
+        <div class="pstat"><div class="pstat-v" style="color:var(--warning)">14h</div><div class="pstat-l">Overtime</div></div>
+        <div class="pstat"><div class="pstat-v" style="color:var(--accent2)">7</div><div class="pstat-l">Leave Days Left</div></div>
+      </div>
+      <div class="chart-row">
+        <div class="card">
+          <div class="card-title">📅 My Last 7 Days</div>
+          <div class="bar-chart-wrap" id="myBarChart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">💰 My Salary Slip — Feb 2026</div>
+          <div id="mySlip"></div>
+        </div>
+      </div>
+      <div class="sec-hd"><div class="sec-title">Attendance History</div></div>
+      <div class="tbl-wrap">
+        <table><thead><tr><th>Date</th><th>Day</th><th>In</th><th>Out</th><th>Break</th><th>Net Hrs</th><th>OT</th><th>Status</th></tr></thead>
+        <tbody id="profileTbl"></tbody></table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+</div><!-- /layout -->
+</div><!-- /app -->
+
+<!-- MODALS -->
+<div class="modal-bg" id="leaveModal">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Apply for Leave</div><button class="modal-close" onclick="closeModal('leaveModal')">×</button></div>
+    <div class="form-grid">
+      <div class="fg"><label>Employee</label><select class="fc" id="lEmp"><option>Akhila Sharma (Self)</option><option>Chakri</option><option>Pavani Nair</option><option>Karthik Rao</option><option>Harika Menon</option><option>Manohar Iyer</option><option>Charan Pillai</option></select></div>
+      <div class="fg"><label>Leave Type</label><select class="fc" id="lType"><option>Annual Leave</option><option>Sick Leave</option><option>Casual Leave</option><option>Emergency Leave</option><option>Comp Off</option></select></div>
+      <div class="fg"><label>From</label><input type="date" class="fc" id="lFrom"></div>
+      <div class="fg"><label>To</label><input type="date" class="fc" id="lTo"></div>
+      <div class="fg full"><label>Reason</label><textarea class="fc" id="lReason" placeholder="Describe the reason…"></textarea></div>
+      <div class="fg"><label>Half Day?</label><select class="fc"><option>No — Full Day</option><option>First Half</option><option>Second Half</option></select></div>
+      <div class="fg"><label>Reporting Manager</label><select class="fc"><option>Manager — Manohar Iyer</option><option>HR — Harika Menon</option></select></div>
+    </div>
+    <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('leaveModal')">Cancel</button><button class="btn btn-primary" onclick="submitLeave()">Submit Request</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="empModal">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-title">Add New Employee</div><button class="modal-close" onclick="closeModal('empModal')">×</button></div>
+    <div class="form-grid">
+      <div class="fg"><label>First Name</label><input type="text" class="fc" placeholder="Akhila"></div>
+      <div class="fg"><label>Last Name</label><input type="text" class="fc" placeholder="Sharma"></div>
+      <div class="fg"><label>Employee ID</label><input type="text" class="fc" placeholder="EMP008"></div>
+      <div class="fg"><label>Password</label><input type="text" class="fc" placeholder="123456@"></div>
+      <div class="fg"><label>Email</label><input type="email" class="fc" placeholder="akhila@company.com"></div>
+      <div class="fg"><label>Phone</label><input type="tel" class="fc" placeholder="+91 98765 43210"></div>
+      <div class="fg"><label>Department</label><select class="fc"><option>Engineering</option><option>Design</option><option>Marketing</option><option>HR</option><option>Finance</option><option>Operations</option></select></div>
+      <div class="fg"><label>Role</label><input type="text" class="fc" placeholder="Software Engineer"></div>
+    </div>
+    <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('empModal')">Cancel</button><button class="btn btn-primary" onclick="addEmp()">Add Employee</button></div>
+  </div>
+</div>
+
+<div class="notif" id="notif"><div class="nd" id="nd"></div><span id="ntxt"></span></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ══════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════
+const COLORS=['#5b6af0','#e05fff','#00e5c0','#ffb830','#ff5c7a','#4db8ff','#22d98a'];
+const DEPTS=['Engineering','Design','Marketing','HR','Finance','Operations'];
+
+const EMPLOYEES=[
+  {id:'EMP001',name:'Satya Mahalakshmi',dept:'Engineering',role:'Senior Engineer',join:'2022-01-15',phone:'+91 98765 43210',pwd:'satya@43',color:'#5b6af0',email:'satya.m@company.com'},
+  {id:'EMP002',name:'Satya Sai',dept:'Design',role:'UI/UX Designer',join:'2021-06-10',phone:'+91 87654 32109',pwd:'satyasai@43',color:'#e05fff',email:'satya.sai@company.com'},
+  {id:'EMP003',name:'Puspak Vinay',dept:'Marketing',role:'Marketing Lead',join:'2022-09-05',phone:'+91 76543 21098',pwd:'puspak@43',color:'#00e5c0',email:'puspak@company.com'},
+  {id:'EMP004',name:'Durga Bhavani',dept:'Finance',role:'Financial Analyst',join:'2023-02-20',phone:'+91 65432 10987',pwd:'durga@43',color:'#ffb830',email:'durga@company.com'},
+  {id:'EMP005',name:'Bhanu Sree Kavya',dept:'HR',role:'HR Manager',join:'2020-11-12',phone:'+91 54321 09876',pwd:'bhanu@43',color:'#ff5c7a',email:'bhanu@company.com'},
+  {id:'EMP006',name:'Viyyapu Sai',dept:'Operations',role:'Ops Manager',join:'2021-04-18',phone:'+91 43210 98765',pwd:'viyyapu@43',color:'#4db8ff',email:'viyyapu@company.com'},
+  {id:'EMP007',name:'Chakri',dept:'Engineering',role:'DevOps Engineer',join:'2023-07-01',phone:'+91 32109 87654',pwd:'chakri@43',color:'#22d98a',email:'chakri@company.com'},
+];
+
+const TODAY_ATT=[
+  {emp:'Satya Mahalakshmi',id:'EMP001',dept:'Engineering',in:'09:02',out:'--',hrs:7.4,brk:0.5,ot:0,status:'Present',color:'#5b6af0'},
+  {emp:'Satya Sai',id:'EMP002',dept:'Design',in:'09:24',out:'--',hrs:6.9,brk:0.5,ot:0,status:'Late',color:'#e05fff'},
+  {emp:'Puspak Vinay',id:'EMP003',dept:'Marketing',in:'--',out:'--',hrs:0,brk:0,ot:0,status:'On Leave',color:'#00e5c0'},
+  {emp:'Durga Bhavani',id:'EMP004',dept:'Finance',in:'08:58',out:'18:05',hrs:8.6,brk:0.5,ot:0.6,status:'Present',color:'#ffb830'},
+  {emp:'Bhanu Sree Kavya',id:'EMP005',dept:'HR',in:'09:00',out:'--',hrs:7.2,brk:0.5,ot:0,status:'Present',color:'#ff5c7a'},
+  {emp:'Viyyapu Sai',id:'EMP006',dept:'Operations',in:'09:38',out:'--',hrs:6.5,brk:1.0,ot:0,status:'Late',color:'#4db8ff'},
+  {emp:'Chakri',id:'EMP007',dept:'Engineering',in:'08:50',out:'17:55',hrs:8.6,brk:0.5,ot:0.6,status:'Present',color:'#22d98a'},
+];
+
+let LEAVES=[
+  {emp:'Puspak Vinay',id:'EMP003',dept:'Marketing',type:'Annual Leave',from:'2026-02-27',to:'2026-02-28',days:2,reason:'Family function',applied:'2026-02-22',status:'Approved',color:'#00e5c0'},
+  {emp:'Satya Sai',id:'EMP002',dept:'Design',type:'Sick Leave',from:'2026-03-05',to:'2026-03-06',days:2,reason:'Medical checkup',applied:'2026-02-26',status:'Pending',color:'#e05fff'},
+  {emp:'Durga Bhavani',id:'EMP004',dept:'Finance',type:'Annual Leave',from:'2026-03-10',to:'2026-03-14',days:5,reason:'Vacation',applied:'2026-02-25',status:'Pending',color:'#ffb830'},
+  {emp:'Bhanu Sree Kavya',id:'EMP005',dept:'HR',type:'Casual Leave',from:'2026-03-01',to:'2026-03-01',days:1,reason:'Personal work',applied:'2026-02-27',status:'Pending',color:'#ff5c7a'},
+  {emp:'Viyyapu Sai',id:'EMP006',dept:'Operations',type:'Sick Leave',from:'2026-02-15',to:'2026-02-15',days:1,reason:'Fever',applied:'2026-02-15',status:'Approved',color:'#4db8ff'},
+  {emp:'Satya Mahalakshmi',id:'EMP001',dept:'Engineering',type:'Annual Leave',from:'2026-02-10',to:'2026-02-11',days:2,reason:'Family trip',applied:'2026-02-08',status:'Rejected',color:'#5b6af0'},
+];
+
+// Monthly data
+const MONTHLY_PRESENT=[18,19,17,20,16,19,18];
+const MONTHLY_LATE=[3,2,4,1,3,2,2];
+const MONTHLY_ABSENT=[1,1,2,0,2,1,1];
+
+// Daily trend (days 1-27 Feb)
+const DAILY_PRESENT=[7,7,6,7,6,7,7,7,6,7,5,6,7,6,7,7,6,7,6,5,6,7,6,7,6,7,6];
+const DAILY_LATE=[1,0,1,0,1,0,2,1,1,0,2,1,0,1,0,1,1,0,1,2,1,0,1,0,2,1,2];
+
+// Dept attendance %
+const DEPT_RATES={Engineering:91,Design:86,Marketing:84,HR:95,Finance:88,Operations:81};
+
+// Clock state
+let clockState='out';
+let clockInTime=null;
+let workSecs=0;
+let workTimer=null;
+let todayLogs=[];
+let loggedInUser=null;
+
+// ══════════════════════════════════════
+//  LOGIN
+// ══════════════════════════════════════
+function genParticles(){
+  const c=document.getElementById('loginParticles');
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const cols=['#5b6af0','#e05fff','#00e5c0','#ffb830'];
+    p.style.cssText=`left:${Math.random()*100}%;bottom:0;width:${2+Math.random()*4}px;height:${2+Math.random()*4}px;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${7+Math.random()*12}s;animation-delay:${Math.random()*10}s`;
+    c.appendChild(p);
+  }
+}
+genParticles();
+
+function togglePwd(){
+  const i=document.getElementById('passInput');
+  i.type=i.type==='password'?'text':'password';
+  document.getElementById('passToggle').textContent=i.type==='password'?'👁':'🙈';
+}
+
+function validatePassword(pwd){
+  // min 6 characters (letters/numbers) + at least 1 special char
+  const hasMinLength=pwd.length>=6;
+  const hasSpecial=/[#@!$%&*]/.test(pwd);
+  return hasMinLength&&has
